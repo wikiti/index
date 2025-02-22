@@ -7,7 +7,7 @@ Mi sitio web usado como índice de hipervínculos, accessible desde https://inde
 - [Sitio web](https://danielherzog.es)
 - [ArtStation](https://art.danielherzog.es)
 - [Sketchfab](https://sketchfab.com/wikiti)
-- [Recetas](https://recipes.danielherzog.es)
+- [Recetas](https://recetas.danielherzog.es)
 
 ## Juegos de mesa
 
