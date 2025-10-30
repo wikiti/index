@@ -13,3 +13,7 @@ Mi sitio web usado como índice de hipervínculos, accessible desde https://inde
 
 - [Reglas scoundrel](http://stfj.net/art/2011/Scoundrel.pdf)
 - [Wavelength](https://wavelength.danielherzog.es)
+
+## Otros
+
+- [Cumple de Raquel 2025](/public/cumple-raquelween.html)

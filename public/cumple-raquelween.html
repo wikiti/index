@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎃 Cumpleween de Raquel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a0a2e 0%, #2d1b3d 50%, #1a0a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #ff6b35;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 3px 3px 6px rgba(255, 107, 53, 0.5); }
+            50% { text-shadow: 3px 3px 20px rgba(255, 107, 53, 0.9); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .mission-box {
+            background: linear-gradient(135deg, #2d1b3d 0%, #3d2952 100%);
+            border: 3px solid #ff6b35;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+            animation: fadeIn 1.5s ease-in;
+        }
+
+        .mission-box h2 {
+            color: #ff6b35;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .mission-box p {
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            animation: fadeIn 2s ease-in;
+        }
+
+        .item-card {
+            background: linear-gradient(135deg, #3d2952 0%, #512e5f 100%);
+            border: 2px solid #9b59b6;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.2);
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.4);
+            border-color: #ff6b35;
+        }
+
+        .item-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .item-title {
+            color: #ff6b35;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .item-description {
+            color: #c8c8c8;
+            font-style: italic;
+            line-height: 1.6;
+            font-size: 1.05em;
+        }
+
+        .warning {
+            background: rgba(255, 107, 53, 0.1);
+            border: 2px dashed #ff6b35;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 40px;
+            font-size: 1.1em;
+            color: #ff6b35;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .time-restriction {
+            background: rgba(255, 0, 0, 0.2);
+            border: 3px solid #ff0000;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            font-size: 1.5em;
+            color: #ff6b35;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #9b59b6;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="timeRestriction" class="time-restriction hidden">
+            <h2>🎃 ¡Espera! 🎃</h2>
+            <p>Esta página solo está activa a partir de las 19:00</p>
+            <p>Vuelve más tarde para comenzar la aventura...</p>
+        </div>
+
+        <div id="mainContent" class="hidden">
+            <header>
+                <h1>🎃 Cumpleween de Raquel 🎃</h1>
+            </header>
+
+            <div class="mission-box">
+                <h2>🎥 Misión secreta: ¡Luces, cámara... misterio!</h2>
+                <p>👀 Busca los objetos escondidos por la casa, pero <strong>no los cojas</strong>, solo descubre dónde están</p>
+                <p>🤫 Hazlo en secreto, <strong>sin decir nada a nadie</strong></p>
+                <p>🗣️ Cuando creas haberlos encontrado todos, <strong>cuéntaselo a la anfitriona en voz baja...</strong></p>
+                <p>🎁 Si eres el primero en acertar, <strong>tendrás tu recompensa</strong></p>
+            </div>
+
+            <div class="items-grid">
+                <div class="item-card">
+                    <span class="item-icon">👻</span>
+                    <div class="item-title">1. Fantasma de goma</div>
+                    <div class="item-description">"Búscame flotando sin miedo, soy un fantasma pequeñito… pero de goma y muy travieso."</div>
+                </div>
+
+                <div class="item-card">
+                    <span class="item-icon">👁</span>
+                    <div class="item-title">2. Ojo verde</div>
+                    <div class="item-description">"Hay algo que te observa… pero tranquilo, es solo un ojo verde que todo lo ve."</div>
+                </div>
+
+                <div class="item-card">
+                    <span class="item-icon">🎬</span>
+                    <div class="item-title">3. Claqueta de madera</div>
+                    <div class="item-description">"Si oyes ¡acción! sabrás que estoy cerca. Soy la claqueta que da comienzo al terror."</div>
+                </div>
+
+                <div class="item-card">
+                    <span class="item-icon">🖤</span>
+                    <div class="item-title">4. Silueta de Miércoles Addams</div>
+                    <div class="item-description">"Ni sonrío ni parpadeo, siempre visto de negro. Encuentra mi silueta, soy Miércoles Addams, sin un pelo despeinado."</div>
+                </div>
+
+                <div class="item-card">
+                    <span class="item-icon">🦴</span>
+                    <div class="item-title">5. Hueso de pie</div>
+                    <div class="item-description">"No camina, pero pertenece a un pie. Busca el hueso perdido antes de que cobre vida."</div>
+                </div>
+
+                <div class="item-card">
+                    <span class="item-icon">🧙</span>
+                    <div class="item-title">6. Etiqueta de botella con una bruja</div>
+                    <div class="item-description">"Entre pociones y risas maléficas me escondo. Soy una etiqueta de botella con una bruja volando."</div>
+                </div>
+            </div>
+
+            <div class="warning">
+                ⚠️ Recuerda: ¡Solo mira, no toques! Y sobre todo... ¡discreción absoluta! 🤐
+            </div>
+
+            <footer>
+                <p>🕷️ Que la suerte te acompañe en esta búsqueda terrorífica 🕷️</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        function checkTime() {
+            const now = new Date();
+            const hour = now.getHours();
+            
+            // Activo de 19:00 a 02:00
+            // Esto incluye 19:00-23:59 y 00:00-02:00
+            const isActive = (hour >= 19) || (hour >= 0 && hour < 2);
+            
+            const mainContent = document.getElementById('mainContent');
+            const timeRestriction = document.getElementById('timeRestriction');
+            
+            if (isActive) {
+                mainContent.classList.remove('hidden');
+                timeRestriction.classList.add('hidden');
+            } else {
+                mainContent.classList.add('hidden');
+                timeRestriction.classList.remove('hidden');
+            }
+        }
+
+        // Comprobar al cargar la página
+        checkTime();
+
+        // Comprobar cada minuto por si cambia la hora
+        setInterval(checkTime, 60000);
+    </script>
+</body>
+</html>
