@@ -17,3 +17,4 @@ Mi sitio web usado como índice de hipervínculos, accessible desde https://inde
 ## Otros
 
 - [Cumple de Raquel 2025](/public/cumple-raquelween.html)
+- [Corrector de exámenes](/public/corrector-examenes.html)
