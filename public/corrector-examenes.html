@@ -53,7 +53,7 @@ input[type=number], input[type=text]{width:84px; padding:6px; border:1px solid #
   <h3>Preguntas</h3>
   <table id="cfgTable">
     <thead>
-      <tr><th>Puntos</th><th>Total</th><th></th></tr>
+      <tr><th>Pregunta</th><th>Puntos</th><th>Total</th><th></th></tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -96,6 +96,11 @@ function addCfgRow(puntos=0, total=0) {
   const tb = document.querySelector('#cfgTable tbody');
   const tr = document.createElement('tr');
 
+  const c0 = document.createElement('td');
+  c0.className = 'qlabel';
+  c0.textContent = `Pregunta ${tb.children.length + 1}`;
+  tr.appendChild(c0);
+
   const c1 = document.createElement('td');
   const i1 = document.createElement('input');
   i1.type = 'number'; i1.value = puntos;
@@ -114,17 +119,26 @@ function addCfgRow(puntos=0, total=0) {
   const btn = document.createElement('button');
   btn.textContent = 'X';
   btn.className = 'btn delete';
-  btn.onclick = () => { tr.remove(); saveConfigFromUI(); };
+  btn.onclick = () => { tr.remove(); actualizarEtiquetasCfg(); saveConfigFromUI(); };
   c3.appendChild(btn);
   tr.appendChild(c3);
 
   tb.appendChild(tr);
+  actualizarEtiquetasCfg();
 }
 
 function cargarConfigEnUI(config) {
   const tb = document.querySelector('#cfgTable tbody');
   tb.innerHTML = '';
   config.preguntas.forEach(x => addCfgRow(x.puntos, x.total));
+  actualizarEtiquetasCfg();
+}
+
+function actualizarEtiquetasCfg() {
+  document.querySelectorAll('#cfgTable tbody tr').forEach((tr, i) => {
+    const cell = tr.querySelector('.qlabel');
+    if (cell) cell.textContent = `Pregunta ${i+1}`;
+  });
 }
 
 function saveConfigFromUI() {
@@ -164,8 +178,8 @@ function validarAciertos() {
 function extraerConfigDeUI() {
   const preguntas = [];
   document.querySelectorAll('#cfgTable tbody tr').forEach(tr => {
-    const pts = parseFloat(tr.children[0].firstChild.value) || 0;
-    const tot = parseFloat(tr.children[1].firstChild.value) || 0;
+    const pts = parseFloat(tr.children[1].firstChild.value) || 0;
+    const tot = parseFloat(tr.children[2].firstChild.value) || 0;
     preguntas.push({ puntos: pts, total: tot });
   });
   return { preguntas };
