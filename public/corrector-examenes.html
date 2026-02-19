@@ -4,19 +4,50 @@
 <title>Corrector</title>
 
 <style>
-body { font-family:sans-serif; margin:20px; }
-table { border-collapse:collapse; margin-top:10px; }
-td,th { border:1px solid #ccc; padding:4px; }
-input[type=number] { width:80px; }
-#historial div { border-bottom:1px solid #eee; padding:3px 0; }
-#historial small { color:#666; margin-left:6px; }
+:root{
+  --bg:#f5f6f7;
+  --surface:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --accent:#2b4b7a;
+  --accent-2:#7a5a2b;
+}
+body{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:28px; background:var(--bg); color:var(--text)}
+.page{max-width:980px; margin:0 auto}
+.card{background:var(--surface); padding:16px 18px; border-radius:8px; box-shadow:0 1px 4px rgba(16,24,40,0.04); border-left:4px solid var(--accent); margin-top:18px}
+h1,h2,h3{margin:6px 0}
+table{border-collapse:collapse; margin-top:8px; width:100%}
+td,th{border:1px solid #e6e9ee; padding:6px}
+input[type=number], input[type=text]{width:84px; padding:6px; border:1px solid #d6dbe3; border-radius:6px}
+.controls{display:flex; gap:8px; align-items:center}
+#controls .btn{background:var(--accent); color:white; border:0; padding:8px 10px; border-radius:6px; cursor:pointer}
+#controls .btn.secondary{background:var(--accent-2)}
+.btn.delete{background:#ef4444; color:white; border:0; padding:6px 8px; border-radius:6px; cursor:pointer}
+.invalid{border-color:#b91c1c !important; color:#b91c1c !important}
+#historial div{border-bottom:1px solid #eee; padding:8px 0}
+#historial small{color:var(--muted); margin-left:8px}
+.grading-container{display:flex; align-items:center; gap:18px; margin-top:10px}
+.grade-inputs{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.grade-inputs .item{display:flex; flex-direction:column; align-items:center}
+.grade-inputs label{font-size:12px; color:var(--muted); margin-bottom:6px}
+.final-grade{margin-left:auto; font-size:20px; font-weight:600; color:var(--surface); background:var(--accent); padding:8px 12px; border-radius:8px}
+.small-muted{color:var(--muted); font-size:13px}
+.final-grade.over{background:transparent; color:#b91c1c; border:2px solid #b91c1c}
+#historial div.over{color:#b91c1c}
+#historial div.over small{color:#b91c1c}
 </style>
 
 <body>
+<div class="page">
 
-<button id="toggleCfg">Mostrar configuración</button>
+<div class="card" style="border-left-color:var(--accent)">
+  <h2>¿Qué es esto?</h2>
+  <p>Esta pequeña aplicación calcula la nota de un examen a partir de una configuración de preguntas: asigne los puntos por pregunta y su total (por ejemplo, la primera pregunta vale 2 puntos, y tiene 5 elementos), luego introduzca los aciertos por alumno y verá la nota final.</p>
+  <p>Configure las preguntas arriba, los cambios se guardan automáticamente. A la derecha verá la nota en tiempo real; si la nota supera la suma de puntos configurada se mostrará en rojo.</p>
+  <p>Para introducir notas rápidamente use <em>Tab</em> para moverse entre campos y <em>Enter</em> en el último campo para registrar la nota en el historial.</p>
+</div>
 
-<div id="config" style="display:none; margin-top:20px;">
+<div id="config" class="card">
   <h2>Configuración</h2>
 
   <h3>Preguntas</h3>
@@ -27,26 +58,25 @@ input[type=number] { width:80px; }
     <tbody></tbody>
   </table>
 
-  <button id="addCfg">Añadir pregunta</button>
-  <br><br>
-  <button id="saveCfg">Guardar cambios</button>
+  <div id="controls" style="margin-top:10px" class="controls">
+    <button id="addCfg" class="btn">Añadir pregunta</button>
+  </div>
+  <div id="cfgWarn" class="small-muted" style="margin-top:8px"></div>
 </div>
 
-<div id="grading" style="margin-top:30px;">
+<div id="grading" class="card">
   <h2>Corrección</h2>
-  <table id="gradeTable">
-    <thead><tr><th>Aciertos</th></tr></thead>
-    <tbody></tbody>
-  </table>
 
-  <div style="margin-top:10px;font-size:20px;">
-    Nota: <span id="nota">0</span>
+  <div class="grading-container">
+    <div id="gradeRow" class="grade-inputs" aria-label="Aciertos"></div>
+    <div class="final-grade">Nota: <span id="nota">0</span></div>
   </div>
 
-  <h3>Historial</h3>
+  <h3 style="margin-top:18px">Historial</h3>
   <div id="historial"></div>
 </div>
 
+</div>
 <script>
 // ------------------------------------------------------------
 function calcularNota(preguntas, aciertos) {
@@ -69,19 +99,22 @@ function addCfgRow(puntos=0, total=0) {
   const c1 = document.createElement('td');
   const i1 = document.createElement('input');
   i1.type = 'number'; i1.value = puntos;
+  i1.addEventListener('blur', saveConfigFromUI);
   c1.appendChild(i1);
   tr.appendChild(c1);
 
   const c2 = document.createElement('td');
   const i2 = document.createElement('input');
   i2.type = 'number'; i2.value = total;
+  i2.addEventListener('blur', saveConfigFromUI);
   c2.appendChild(i2);
   tr.appendChild(c2);
 
   const c3 = document.createElement('td');
   const btn = document.createElement('button');
   btn.textContent = 'X';
-  btn.onclick = () => tr.remove();
+  btn.className = 'btn delete';
+  btn.onclick = () => { tr.remove(); saveConfigFromUI(); };
   c3.appendChild(btn);
   tr.appendChild(c3);
 
@@ -92,6 +125,40 @@ function cargarConfigEnUI(config) {
   const tb = document.querySelector('#cfgTable tbody');
   tb.innerHTML = '';
   config.preguntas.forEach(x => addCfgRow(x.puntos, x.total));
+}
+
+function saveConfigFromUI() {
+  const cfg = extraerConfigDeUI();
+  localStorage.setItem('cfg', JSON.stringify(cfg));
+  aplicarConfigAlaCorreccion(cfg);
+  validarSumaPuntos(cfg);
+  actualizarNotaTiempoReal();
+}
+
+function validarSumaPuntos(cfg) {
+  const sum = (cfg.preguntas || []).reduce((s,p) => s + (parseFloat(p.puntos)||0), 0);
+  const warn = document.getElementById('cfgWarn');
+  if (!warn) return;
+  if (Math.abs(sum - 10) > 1e-6) {
+    warn.textContent = `Advertencia: la suma de puntos es ${sum} (debería ser 10)`;
+    warn.style.color = 'var(--accent-2)';
+  } else {
+    warn.textContent = '';
+  }
+}
+
+function validarAciertos() {
+  if (!cfgActual || !cfgActual.preguntas) return;
+  document.querySelectorAll('#gradeRow input').forEach(inp => {
+    const idx = parseInt(inp.dataset.index);
+    const total = cfgActual.preguntas[idx] ? (parseFloat(cfgActual.preguntas[idx].total)||0) : 0;
+    const val = parseFloat(inp.value)||0;
+    if (val > total) {
+      inp.classList.add('invalid');
+    } else {
+      inp.classList.remove('invalid');
+    }
+  });
 }
 
 function extraerConfigDeUI() {
@@ -110,12 +177,16 @@ let cfgActual = null;
 function aplicarConfigAlaCorreccion({ preguntas }) {
   cfgActual = { preguntas };
 
-  const tb = document.querySelector('#gradeTable tbody');
-  tb.innerHTML = '';
+  const container = document.getElementById('gradeRow');
+  container.innerHTML = '';
 
   preguntas.forEach((q, idx) => {
-    const tr = document.createElement('tr');
-    const td = document.createElement('td');
+    const wrap = document.createElement('div');
+    wrap.className = 'item';
+
+    const lbl = document.createElement('label');
+    lbl.textContent = `Pregunta ${idx+1}`;
+
     const inp = document.createElement('input');
     inp.type = 'number';
     inp.dataset.index = idx;
@@ -129,10 +200,11 @@ function aplicarConfigAlaCorreccion({ preguntas }) {
       }
     });
 
-    td.appendChild(inp);
-    tr.appendChild(td);
-    tb.appendChild(tr);
+    wrap.appendChild(lbl);
+    wrap.appendChild(inp);
+    container.appendChild(wrap);
   });
+
 }
 
 // ------------------------------------------------------------
@@ -140,12 +212,21 @@ function actualizarNotaTiempoReal() {
   const preguntas = cfgActual.preguntas;
   const aciertos = [];
 
-  document.querySelectorAll('#gradeTable input').forEach(inp => {
+  document.querySelectorAll('#gradeRow input').forEach(inp => {
     aciertos[inp.dataset.index] = parseFloat(inp.value) || 0;
   });
 
   const nota = calcularNota(preguntas, aciertos);
   document.getElementById('nota').textContent = nota.toFixed(2);
+  validarAciertos();
+  // marcar si la nota supera la suma de puntos
+  const totalPosible = (cfgActual.preguntas || []).reduce((s,p) => s + (parseFloat(p.puntos)||0), 0);
+  const finalBox = document.querySelector('.final-grade');
+  if (nota > totalPosible + 1e-9) {
+    finalBox.classList.add('over');
+  } else {
+    finalBox.classList.remove('over');
+  }
 }
 
 // ------------------------------------------------------------
@@ -153,7 +234,7 @@ function registrarAlumno() {
   const preguntas = cfgActual.preguntas;
   const aciertos = [];
 
-  document.querySelectorAll('#gradeTable input').forEach(inp => {
+  document.querySelectorAll('#gradeRow input').forEach(inp => {
     aciertos[inp.dataset.index] = parseFloat(inp.value) || 0;
   });
 
@@ -171,27 +252,20 @@ function registrarAlumno() {
     <small>(${aciertosTexto})</small>
   `;
 
+  // marcar historial en rojo si supera total posible
+  const totalPosible = (cfgActual.preguntas || []).reduce((s,p) => s + (parseFloat(p.puntos)||0), 0);
+  if (nota > totalPosible + 1e-9) div.classList.add('over');
+
   h.appendChild(div);
 
-  document.querySelectorAll('#gradeTable input').forEach(inp => inp.value = '');
-  document.querySelector('#gradeTable input').focus();
+  document.querySelectorAll('#gradeRow input').forEach(inp => inp.value = '');
+  const first = document.querySelector('#gradeRow input');
+  if (first) first.focus();
   actualizarNotaTiempoReal();
 }
 
 // ------------------------------------------------------------
-document.getElementById('toggleCfg').onclick = () => {
-  const cfg = document.getElementById('config');
-  cfg.style.display = cfg.style.display === 'none' ? 'block' : 'none';
-};
-
 document.getElementById('addCfg').onclick = () => addCfgRow();
-
-document.getElementById('saveCfg').onclick = () => {
-  const cfg = extraerConfigDeUI();
-  localStorage.setItem('cfg', JSON.stringify(cfg));
-  aplicarConfigAlaCorreccion(cfg);
-  actualizarNotaTiempoReal();
-};
 
 // ------------------------------------------------------------
 (function init() {
@@ -200,10 +274,12 @@ document.getElementById('saveCfg').onclick = () => {
     const cfg = JSON.parse(saved);
     cargarConfigEnUI(cfg);
     aplicarConfigAlaCorreccion(cfg);
+    validarSumaPuntos(cfg);
   } else {
     addCfgRow();
     const cfg = extraerConfigDeUI();
     aplicarConfigAlaCorreccion(cfg);
+    validarSumaPuntos(cfg);
   }
   actualizarNotaTiempoReal();
 })();
