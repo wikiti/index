@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<meta charset="UTF-8">
+<title>Corrector</title>
+
+<style>
+body { font-family:sans-serif; margin:20px; }
+table { border-collapse:collapse; margin-top:10px; }
+td,th { border:1px solid #ccc; padding:4px; }
+input[type=number] { width:80px; }
+#historial div { border-bottom:1px solid #eee; padding:3px 0; }
+#historial small { color:#666; margin-left:6px; }
+</style>
+
+<body>
+
+<button id="toggleCfg">Mostrar configuración</button>
+
+<div id="config" style="display:none; margin-top:20px;">
+  <h2>Configuración</h2>
+
+  <h3>Preguntas</h3>
+  <table id="cfgTable">
+    <thead>
+      <tr><th>Puntos</th><th>Total</th><th></th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <button id="addCfg">Añadir pregunta</button>
+  <br><br>
+  <button id="saveCfg">Guardar cambios</button>
+</div>
+
+<div id="grading" style="margin-top:30px;">
+  <h2>Corrección</h2>
+  <table id="gradeTable">
+    <thead><tr><th>Aciertos</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <div style="margin-top:10px;font-size:20px;">
+    Nota: <span id="nota">0</span>
+  </div>
+
+  <h3>Historial</h3>
+  <div id="historial"></div>
+</div>
+
+<script>
+// ------------------------------------------------------------
+function calcularNota(preguntas, aciertos) {
+  let n = preguntas.length;
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    const p = preguntas[i].puntos;
+    const t = preguntas[i].total;
+    const a = aciertos[i] ?? 0;
+    if (t > 0) total += p * (a / t);
+  }
+  return total;
+}
+
+// ------------------------------------------------------------
+function addCfgRow(puntos=0, total=0) {
+  const tb = document.querySelector('#cfgTable tbody');
+  const tr = document.createElement('tr');
+
+  const c1 = document.createElement('td');
+  const i1 = document.createElement('input');
+  i1.type = 'number'; i1.value = puntos;
+  c1.appendChild(i1);
+  tr.appendChild(c1);
+
+  const c2 = document.createElement('td');
+  const i2 = document.createElement('input');
+  i2.type = 'number'; i2.value = total;
+  c2.appendChild(i2);
+  tr.appendChild(c2);
+
+  const c3 = document.createElement('td');
+  const btn = document.createElement('button');
+  btn.textContent = 'X';
+  btn.onclick = () => tr.remove();
+  c3.appendChild(btn);
+  tr.appendChild(c3);
+
+  tb.appendChild(tr);
+}
+
+function cargarConfigEnUI(config) {
+  const tb = document.querySelector('#cfgTable tbody');
+  tb.innerHTML = '';
+  config.preguntas.forEach(x => addCfgRow(x.puntos, x.total));
+}
+
+function extraerConfigDeUI() {
+  const preguntas = [];
+  document.querySelectorAll('#cfgTable tbody tr').forEach(tr => {
+    const pts = parseFloat(tr.children[0].firstChild.value) || 0;
+    const tot = parseFloat(tr.children[1].firstChild.value) || 0;
+    preguntas.push({ puntos: pts, total: tot });
+  });
+  return { preguntas };
+}
+
+let cfgActual = null;
+
+// ------------------------------------------------------------
+function aplicarConfigAlaCorreccion({ preguntas }) {
+  cfgActual = { preguntas };
+
+  const tb = document.querySelector('#gradeTable tbody');
+  tb.innerHTML = '';
+
+  preguntas.forEach((q, idx) => {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    const inp = document.createElement('input');
+    inp.type = 'number';
+    inp.dataset.index = idx;
+
+    inp.addEventListener('input', actualizarNotaTiempoReal);
+
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && idx === preguntas.length - 1) {
+        e.preventDefault();
+        registrarAlumno();
+      }
+    });
+
+    td.appendChild(inp);
+    tr.appendChild(td);
+    tb.appendChild(tr);
+  });
+}
+
+// ------------------------------------------------------------
+function actualizarNotaTiempoReal() {
+  const preguntas = cfgActual.preguntas;
+  const aciertos = [];
+
+  document.querySelectorAll('#gradeTable input').forEach(inp => {
+    aciertos[inp.dataset.index] = parseFloat(inp.value) || 0;
+  });
+
+  const nota = calcularNota(preguntas, aciertos);
+  document.getElementById('nota').textContent = nota.toFixed(2);
+}
+
+// ------------------------------------------------------------
+function registrarAlumno() {
+  const preguntas = cfgActual.preguntas;
+  const aciertos = [];
+
+  document.querySelectorAll('#gradeTable input').forEach(inp => {
+    aciertos[inp.dataset.index] = parseFloat(inp.value) || 0;
+  });
+
+  const nota = calcularNota(preguntas, aciertos);
+
+  document.getElementById('nota').textContent = nota.toFixed(2);
+
+  const h = document.getElementById('historial');
+  const div = document.createElement('div');
+
+  const aciertosTexto = aciertos.join(', ');
+
+  div.innerHTML = `
+    ${nota.toFixed(2)}
+    <small>(${aciertosTexto})</small>
+  `;
+
+  h.appendChild(div);
+
+  document.querySelectorAll('#gradeTable input').forEach(inp => inp.value = '');
+  document.querySelector('#gradeTable input').focus();
+  actualizarNotaTiempoReal();
+}
+
+// ------------------------------------------------------------
+document.getElementById('toggleCfg').onclick = () => {
+  const cfg = document.getElementById('config');
+  cfg.style.display = cfg.style.display === 'none' ? 'block' : 'none';
+};
+
+document.getElementById('addCfg').onclick = () => addCfgRow();
+
+document.getElementById('saveCfg').onclick = () => {
+  const cfg = extraerConfigDeUI();
+  localStorage.setItem('cfg', JSON.stringify(cfg));
+  aplicarConfigAlaCorreccion(cfg);
+  actualizarNotaTiempoReal();
+};
+
+// ------------------------------------------------------------
+(function init() {
+  const saved = localStorage.getItem('cfg');
+  if (saved) {
+    const cfg = JSON.parse(saved);
+    cargarConfigEnUI(cfg);
+    aplicarConfigAlaCorreccion(cfg);
+  } else {
+    addCfgRow();
+    const cfg = extraerConfigDeUI();
+    aplicarConfigAlaCorreccion(cfg);
+  }
+  actualizarNotaTiempoReal();
+})();
+</script>
+
+</body>
+</html>
