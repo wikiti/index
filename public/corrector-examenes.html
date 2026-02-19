@@ -105,6 +105,17 @@ function addCfgRow(puntos=0, total=0) {
   const i1 = document.createElement('input');
   i1.type = 'number'; i1.value = puntos;
   i1.addEventListener('blur', saveConfigFromUI);
+  i1.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addCfgRow();
+      // focus last row first input
+      setTimeout(() => {
+        const last = document.querySelector('#cfgTable tbody tr:last-child input');
+        if (last) last.focus();
+      }, 0);
+    }
+  });
   c1.appendChild(i1);
   tr.appendChild(c1);
 
@@ -112,6 +123,16 @@ function addCfgRow(puntos=0, total=0) {
   const i2 = document.createElement('input');
   i2.type = 'number'; i2.value = total;
   i2.addEventListener('blur', saveConfigFromUI);
+  i2.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addCfgRow();
+      setTimeout(() => {
+        const last = document.querySelector('#cfgTable tbody tr:last-child input');
+        if (last) last.focus();
+      }, 0);
+    }
+  });
   c2.appendChild(i2);
   tr.appendChild(c2);
 
